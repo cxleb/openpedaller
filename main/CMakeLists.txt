@@ -1,0 +1,9 @@
+idf_component_register(
+                    SRCS 
+                        "openpedaller.c"
+                        "peripherals/lcd.c"
+                        "ui/ui.c"
+                        "ui/martian_mono_80.c"
+                        "ui/roboto_72.c"
+                    INCLUDE_DIRS 
+                        ".")

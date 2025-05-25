@@ -1,0 +1,3 @@
+[submodule "libnmea/libnmea"]
+	path = libnmea/libnmea
+	url = https://github.com/jacketizer/libnmea
