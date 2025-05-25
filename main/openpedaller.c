@@ -1,18 +1,14 @@
 #include "openpedaller.h"
-//#include <cassert.h>
-//#include <climits>
 #include <stdio.h>
 #include <string.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
 #include "driver/uart.h"
-//#include "driver/gpio.h"
 #include "esp_log.h"
 
 #include "freertos/idf_additions.h"
 #include "freertos/projdefs.h"
-#include "lv_demos.h"
 
 #include "peripherals/peripherals.h"
 #include "ui/ui.h"
@@ -21,22 +17,6 @@
 #include "gpgll.h"
 #include "gpgga.h"
 #include "gpvtg.h"
-
-// void app_push_event(app_t *app, event_t event) {
-//     // get write access
-//     xSemaphoreTake(app->event_write_lock, 1);
-//     app->events[app->event_write++] = event;
-//     xSemaphoreGive(app->event_write_lock);
-//     xSemaphoreGive(app->event_read_lock);
-// }
-
-// event_t app_wait_event(app_t *app) {
-//     // wait for push to give us an event
-//     xSemaphoreTake(app->event_read_lock, 1);
-//     //assert(app->event_read == app->event_write);
-//     event_t ev;
-//     return ev;
-// }
 
 #define ECHO_UART_BAUD_RATE 9600
 #define ECHO_UART_PORT_NUM 0
@@ -195,11 +175,6 @@ static void example_lvgl_port_task(void *arg)
     ESP_LOGI(TAG, "Starting LVGL task");
     uint32_t task_delay_ms = EXAMPLE_LVGL_TASK_MAX_DELAY_MS;
     while (1) {
-        // Lock the mutex due to the LVGL APIs are not thread-safe
-        //if (example_lvgl_lock(-1)) {
-        //    // Release the mutex
-        //    example_lvgl_unlock();
-        //}
         task_delay_ms = lv_timer_handler();
         if (task_delay_ms > EXAMPLE_LVGL_TASK_MAX_DELAY_MS) {
             task_delay_ms = EXAMPLE_LVGL_TASK_MAX_DELAY_MS;
@@ -225,15 +200,7 @@ void app_main(void)
     app->gps_time_hour = 0;
     app->gps_time_minute = 0;
     app->gps_time_second = 0;
-    //app->gps
     app->handling_task = xTaskGetCurrentTaskHandle();
-    // app->event_read = 0;
-    // app->event_write = 0;
-    // app->event_read_lock = xSemaphoreCreateMutex();
-    // app->event_write_lock = xSemaphoreCreateMutex();
-    // immediately take the read mutex, another thread will give it
-    // xSemaphoreTake(app->event_read_lock, 1);
-    // EventGroupHandle_t event_group = xEventGroupCreate();
 
     lcd_init();
     ui_t *ui = ui_init();
@@ -243,7 +210,7 @@ void app_main(void)
     
     lvgl_mux = xSemaphoreCreateMutex();
 
-    xTaskCreate(gps_task, "gps_task", 4096, app, 10, NULL);
+    xTaskCreate(gps_task, "gps_task", 8192, app, 10, NULL);
     xTaskCreate(example_lvgl_port_task, "ui_task", 4096, NULL, 10, NULL);
 
     const TickType_t max_block_time = pdMS_TO_TICKS( 500 );
@@ -258,6 +225,5 @@ void app_main(void)
         if ((value & GPS_TASK) != 0) {
             ui_update_stats(ui, app);
         }
-        //vTaskDelay(pdMS_TO_TICKS(500));
     }
 }
