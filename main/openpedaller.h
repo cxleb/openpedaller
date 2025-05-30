@@ -33,4 +33,6 @@ typedef struct app_s {
     TaskHandle_t handling_task;
 } app_t;
 
+void app_notify_main(app_t *app, int task);
+
 #endif

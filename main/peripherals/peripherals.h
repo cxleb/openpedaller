@@ -2,6 +2,7 @@
 #define PERIPHERALS_H
 
 #include "sdkconfig.h"
+#include "../openpedaller.h"
 
 #define Rotate_90    0
 #define Rotate_NONO  1
@@ -58,6 +59,6 @@
 #define EXAMPLE_LVGL_TASK_PRIORITY     2
 
 void lcd_init();
-void gps_init();
+void gps_init(app_t *app);
 
 #endif
