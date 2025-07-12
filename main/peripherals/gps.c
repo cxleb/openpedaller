@@ -13,22 +13,25 @@
 static int process_nmea(nmea_s* data, app_t *app) {
     app->gps_got_first_single = true;
     if (data->type == NMEA_GPGGA) {
-        printf("GPGGA Sentence\n");
+        //printf("GPGGA Sentence\n");
         nmea_gpgga_s *gpgga = (nmea_gpgga_s *) data;
         // when we get our first correct gps signal we need to set gps has signal
         app->gps_no_satl = gpgga->n_satellites;
          
-        if (app->gps_no_satl > 0) {
-            app->gps_has_lock = true;
+        // do this before setting if gps has more then 1 sattelite
+        if (app->gps_has_lock) {
+            app->gps_previous_alt = app->gps_current_alt;
+            app->gps_current_alt = gpgga->altitude;
+            float alt_delta = app->gps_current_alt - app->gps_previous_alt;
+            if (alt_delta > 0) {
+                app->gps_alt_gained += alt_delta;
+            } else {
+                app->gps_alt_lost += -alt_delta;
+            }
         }
 
-        app->gps_previous_alt = app->gps_current_alt;
-        app->gps_current_alt = gpgga->altitude;
-        float alt_delta = app->gps_current_alt - app->gps_previous_alt;
-        if (alt_delta > 0) {
-            app->gps_alt_gained += alt_delta;
-        } else {
-            app->gps_alt_lost += -alt_delta;
+        if (app->gps_no_satl > 0) {
+            app->gps_has_lock = true;
         }
         return true;
     } else if (NMEA_GPGLL == data->type) {
@@ -40,7 +43,7 @@ static int process_nmea(nmea_s* data, app_t *app) {
         app->gps_time_minute = gpgll->time.tm_min;
         app->gps_time_second = gpgll->time.tm_sec;
 
-       printf("GPGLL Sentence\n");
+       //printf("GPGLL Sentence\n");
        //printf("Longitude:\n");
        //printf("  Degrees: %d\n", gpgll->longitude.degrees);
        //printf("  Minutes: %f\n", gpgll->longitude.minutes);
@@ -52,7 +55,7 @@ static int process_nmea(nmea_s* data, app_t *app) {
        return true;
     } else if (NMEA_GPVTG == data->type) {
         nmea_gpvtg_s *gpvtg = (nmea_gpvtg_s *) data;
-        printf("GPVTG Sentence\n");
+        //printf("GPVTG Sentence\n");
         //gpvtg->
         app->gps_current_speed = gpvtg->gndspd_kmph;
         return true;
@@ -95,7 +98,7 @@ static void gps_task_2(void *arg) {
     size_t s_idx = 0;
 
     while(1) {
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(200 / portTICK_PERIOD_MS);
         
         uint16_t available = 0;
         if(!available_bytes(&available)) {
@@ -116,7 +119,7 @@ static void gps_task_2(void *arg) {
 
         ESP_LOGI("gps", "Read %d", len);
 
-        int num_sentence = 0, num_processed = 0;
+        int num_processed = 0;
         bool finished_sentence;
         for (int i = 0; i < len; i++) {
             finished_sentence = false;
@@ -130,7 +133,6 @@ static void gps_task_2(void *arg) {
                 sentence_buf[s_idx++] = '\n';
                 sentence_buf[s_idx] = 0;
                 finished_sentence = true;
-                num_sentence++;
             }
 
             if (finished_sentence) {
@@ -140,9 +142,9 @@ static void gps_task_2(void *arg) {
                     if (process_nmea(nmea, app)) {
                         num_processed++;
                     }
+                    nmea_free(nmea);
                 } else {
                     ESP_LOGI("gps", "Invalid nmea sentence %s\n", sentence_buf);
-                    //printf("Invalid NMEA sentence, %s", sentence_buf);
                 }
                 s_idx = 0;
             }
@@ -151,8 +153,7 @@ static void gps_task_2(void *arg) {
         if (num_processed != 0) {
             app->gps_got_first_single = true;
         }
-//
-        // if we processed some gps messages, we need to update the ui
+
         if (num_processed != 0) {
             app_notify_main(app, GPS_TASK);
         }
@@ -163,5 +164,4 @@ static void gps_task_2(void *arg) {
 
 void gps_init(app_t *app) {
     xTaskCreate(gps_task_2, "gps_task", 8192, app, 10, NULL);
-
 }
