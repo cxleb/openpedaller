@@ -159,10 +159,10 @@ void ui_update_stats(ui_t *ui, app_t *app) {
     } else {
         lv_label_set_text(ui->stats.label_gps_status, "Waiting for GPS");
     }
-    lv_label_set_text_fmt(ui->stats.label_current_speed, "%.2f", app->gps_current_speed);
-    lv_label_set_text_fmt(ui->stats.label_avg_speed, "%.2f", app->gps_avg_speed);
-    lv_label_set_text_fmt(ui->stats.label_distance, "%.2f", app->gps_current_alt);
+    lv_label_set_text_fmt(ui->stats.label_current_speed, "%.0f", app->gps_current_speed);
+    lv_label_set_text_fmt(ui->stats.label_avg_speed, "%.0f", app->gps_avg_speed);
+    lv_label_set_text_fmt(ui->stats.label_distance, "%.0f", app->gps_current_alt);
     lv_label_set_text_fmt(ui->stats.label_time, "%2lu:%2lu", app->gps_time_minute, app->gps_time_second);
-    lv_label_set_text_fmt(ui->stats.label_alt_gained, "%.2f " LV_SYMBOL_UP, app->gps_alt_gained);
-    lv_label_set_text_fmt(ui->stats.label_alt_lost, "%.2f " LV_SYMBOL_DOWN, app->gps_alt_lost);
+    lv_label_set_text_fmt(ui->stats.label_alt_gained, "%.0f " LV_SYMBOL_UP, app->gps_alt_gained);
+    lv_label_set_text_fmt(ui->stats.label_alt_lost, "%.0f " LV_SYMBOL_DOWN, app->gps_alt_lost);
 }
