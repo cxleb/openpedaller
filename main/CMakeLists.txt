@@ -3,6 +3,8 @@ idf_component_register(
                         "openpedaller.c"
                         "peripherals/lcd.c"
                         "peripherals/gps.c"
+                        "peripherals/sdcard.c"
+                        "persistence/gpx.c"
                         "ui/ui.c"
                         "ui/martian_mono_80.c"
                         "ui/roboto_72.c"

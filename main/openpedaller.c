@@ -78,6 +78,7 @@ void app_main(void)
 
     lcd_init();
     gps_init(app);
+    sdcard_init();
     ui_t *ui = ui_init();
 
     // do an initial load to correct any errors

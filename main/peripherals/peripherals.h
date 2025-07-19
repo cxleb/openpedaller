@@ -60,5 +60,6 @@
 
 void lcd_init();
 void gps_init(app_t *app);
+void sdcard_init();
 
 #endif

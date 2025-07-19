@@ -17,11 +17,12 @@ dependencies:
   libnmea:
     path: ../libnmea
   lvgl/lvgl:
-    version: "^8"
+    version: ^8
     public: true
   esp_lcd_touch_ft5x06:
-    version: "*"
+    version: '*'
     public: true
   esp_lcd_sh8601:
-    version: "*"
+    version: '*'
     public: true
+  espressif/expat: ^2.7.0
