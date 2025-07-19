@@ -136,7 +136,7 @@ static void gps_task_2(void *arg) {
             }
 
             if (finished_sentence) {
-                ESP_LOGI("gps", "Processing sentence %s", sentence_buf);
+                //ESP_LOGI("gps", "Processing sentence %s", sentence_buf);
                 nmea_s* nmea = nmea_parse(sentence_buf, s_idx, 0);
                 if (nmea != NULL) {
                     if (process_nmea(nmea, app)) {
@@ -158,7 +158,7 @@ static void gps_task_2(void *arg) {
             app_notify_main(app, GPS_TASK);
         }
 
-        ESP_LOGI("gps", "Done processing batch");
+        ESP_LOGI("gps", "Done processing %d sentences", num_processed);
     }
 }
 
