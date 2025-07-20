@@ -4,7 +4,13 @@
 #include "lvgl.h"
 #include "openpedaller.h"
 
+enum SCREEN {
+    SCREEN_STATS
+};
+
 typedef struct ui_stats_s {
+    lv_obj_t *screen;
+
     lv_obj_t *label_gps_status;
     lv_obj_t *label_current_speed;
     lv_obj_t *label_avg_speed;
@@ -18,7 +24,6 @@ typedef struct ui_stats_s {
 } ui_stats_t;
 
 typedef struct ui_s {
-    lv_obj_t *main_cont;
     ui_stats_t stats;
 } ui_t;
 
